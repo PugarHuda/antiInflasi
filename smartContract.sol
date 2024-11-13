@@ -24,19 +24,23 @@ contract StableCoinAntiInflasi {
     // Deposit USDe and convert it to IDR with current price
     function deposit(uint256 amountUSDe) external {
         uint256 amountIDR = amountUSDe * priceInIDR;
-
         Deposit storage userDeposit = deposits[msg.sender];
+
+        // Calculate yield based on the amount of IDR at the current price
+        uint256 initialYield = calculateYield(amountIDR, priceInIDR);
         
-        // Update yield based on any price change
-        if (userDeposit.amountUSDe > 0) {
-            userDeposit.claimableYield += calculateYield(userDeposit.amountIDR, userDeposit.lastUpdatedPrice);
+        if (userDeposit.amountUSDe == 0) {
+            // If this is the first deposit, add user to address list
+            userAddresses.push(msg.sender);
         } else {
-            userAddresses.push(msg.sender); // Add new user address if this is the first deposit
+            // Update the claimable yield for users who have deposited before
+            userDeposit.claimableYield += calculateYield(userDeposit.amountIDR, userDeposit.lastUpdatedPrice);
         }
 
-        // Record the deposit with current price details
+        // Record the deposit details and yield for this deposit
         userDeposit.amountUSDe += amountUSDe;
         userDeposit.amountIDR += amountIDR;
+        userDeposit.claimableYield += initialYield;
         userDeposit.lastUpdatedPrice = priceInIDR;
     }
 
