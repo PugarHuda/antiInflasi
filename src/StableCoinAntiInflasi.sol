@@ -15,7 +15,7 @@ contract StableCoinAntiInflasi is ERC20 {
         uint256 amountIDR;
     }
 
-    event Mock(uint256 amountUSDe, uint256 priceIdr, uint256 collateralValue, uint256 amountIdr, uint256 debt);
+    event Borrow(address indexed user, uint256 amountIDR);
     event Withdraw(address indexed user, uint256 amountUSDe);
     event Repay(address indexed user, uint256 amountIDR);
 
@@ -24,6 +24,11 @@ contract StableCoinAntiInflasi is ERC20 {
     constructor(address _USDeToken) ERC20("IDR Stablecoin", "IDR") {
         owner = msg.sender;
         USDeToken = _USDeToken;
+    }
+
+    function setPriceInIDR(uint256 newPriceInIDR) external onlyOwner {
+        require(newPriceInIDR > 0, "Price must be greater than 0");
+        priceInIDR = newPriceInIDR;
     }
 
     function mint(uint256 amountUSDe, uint256 borrowIdr) external {
@@ -42,6 +47,7 @@ contract StableCoinAntiInflasi is ERC20 {
 
         _mint(msg.sender, amountIDR);
 
+        emit Borrow(msg.sender, amountIDR);
         isHealthy(msg.sender);
     }
 
@@ -60,14 +66,11 @@ contract StableCoinAntiInflasi is ERC20 {
     function withdraw(uint256 amountUSDe) external {
         require(deposits[msg.sender].amountUSDe >= amountUSDe, "Not enough collateral to withdraw");
 
-        // Check if the loan remains healthy after withdrawal
         uint256 newCollateralValue = (deposits[msg.sender].amountUSDe - amountUSDe) * priceInIDR * LTV / 100;
         require(newCollateralValue >= deposits[msg.sender].amountIDR, "Loan will not be healthy after withdrawal");
 
-        // Update the user's collateral balance
         deposits[msg.sender].amountUSDe -= amountUSDe;
 
-        // Transfer the USDe back to the user
         ERC20(USDeToken).transfer(msg.sender, amountUSDe);
 
         emit Withdraw(msg.sender, amountUSDe);
@@ -79,14 +82,26 @@ contract StableCoinAntiInflasi is ERC20 {
         uint256 collateralValue = deposits[user].amountUSDe * priceInIDR * LTV / 100;
         uint256 debt = deposits[user].amountIDR;
 
-        emit Mock(deposits[user].amountUSDe, priceInIDR, collateralValue, deposits[user].amountIDR, debt);
         require(collateralValue >= debt, "Loan is not healthy");
     }
 
-    function updatePrice(uint256 newPriceInIDR) external onlyOwner {
-        require(newPriceInIDR > 0, "Price must be greater than zero");
-        priceInIDR = newPriceInIDR;
-    }
+    function liquidate(address user) external {
+    uint256 collateralValue = deposits[user].amountUSDe * priceInIDR * LTV / 100;
+    uint256 debt = deposits[user].amountIDR;
+
+    require(collateralValue < debt, "Loan is still healthy, cannot liquidate");
+
+    uint256 remainingCollateral = debt * 100 / (priceInIDR * LTV);
+    deposits[user].amountUSDe = remainingCollateral;
+    deposits[user].amountIDR = 0;
+
+    _burn(user, debt);
+
+    emit Liquidate(user);
+    
+}
+event Liquidate(address indexed user);
+
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can perform this action");
