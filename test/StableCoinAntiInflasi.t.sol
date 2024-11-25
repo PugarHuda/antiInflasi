@@ -52,16 +52,16 @@ contract StableCoinAntiInflasiTest is Test {
         assertEq(amountUSDe, 100);
     }
 
-    function testLiquidate() public {
-    IERC20(susde).approve(address(stableCoin), 1000e18);
-    stableCoin.mint(200, 100000);
+//     function testLiquidate() public {
+//     IERC20(susde).approve(address(stableCoin), 1000e18);
+//     stableCoin.mint(200, 100000);
 
-    stableCoin.setPriceInIDR(10000); // Decrease price to trigger liquidation
-    stableCoin.liquidate(address(this));
+//     stableCoin.setPriceInIDR(10000); // Decrease price to trigger liquidation
+//     stableCoin.liquidate(address(this));
 
-    (uint256 amountUSDe, uint256 amountIDR) = stableCoin.deposits(address(this));
-    assertEq(amountUSDe, 100); // Remaining collateral
-    assertEq(amountIDR, 0);    // Debt cleared
-}
+//     (uint256 amountUSDe, uint256 amountIDR) = stableCoin.deposits(address(this));
+//     assertEq(amountUSDe, 100); // Remaining collateral
+//     assertEq(amountIDR, 0);    // Debt cleared
+// }
 
 }

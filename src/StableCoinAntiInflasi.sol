@@ -85,22 +85,25 @@ contract StableCoinAntiInflasi is ERC20 {
         require(collateralValue >= debt, "Loan is not healthy");
     }
 
-    function liquidate(address user) external {
-    uint256 collateralValue = deposits[user].amountUSDe * priceInIDR * LTV / 100;
-    uint256 debt = deposits[user].amountIDR;
 
-    require(collateralValue < debt, "Loan is still healthy, cannot liquidate");
 
-    uint256 remainingCollateral = debt * 100 / (priceInIDR * LTV);
-    deposits[user].amountUSDe = remainingCollateral;
-    deposits[user].amountIDR = 0;
+//     function liquidate(address user) external {
+//     uint256 collateralValue = deposits[user].amountUSDe * priceInIDR * LTV / 100;
+//     uint256 debt = deposits[user].amountIDR;
 
-    _burn(user, debt);
+//     require(collateralValue < debt, "Loan is still healthy, cannot liquidate");
 
-    emit Liquidate(user);
+//     uint256 remainingCollateral = debt * 100 / (priceInIDR * LTV);
+//     deposits[user].amountUSDe = remainingCollateral;
+//     deposits[user].amountIDR = 0;
+
+//     _burn(user, debt);
+
+// forge create src/StableCoinAntiInflasi.sol:StableCoinAntiInflasi --rpc-url https://holesky.gateway.tenderly.co --verify --etherscan-api-key 47SBFY8BZZC8KFIZBHX37JPJRW71WS45EN --private-key c53af8662980cd3cd17fbc9f8693f40721d452800560e84f389cd40ea720c43a --constructor-args "0x9D39A5DE30e57443BfF2A8307A4256c8797A3497" -- --broadcast
+//     emit Liquidate(user);
     
-}
-event Liquidate(address indexed user);
+// }
+// event Liquidate(address indexed user);
 
 
     modifier onlyOwner() {
