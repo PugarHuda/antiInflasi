@@ -85,7 +85,32 @@ contract StableCoinAntiInflasi is ERC20 {
         require(collateralValue >= debt, "Loan is not healthy");
     }
 
+// mapping(address => uint256) public lastClaimed;
+//     uint256 public annualYieldRate = 10; // 10% per tahun
 
+//     event YieldClaimed(address indexed user, uint256 amount);
+
+//     function calculateYield(address user) public view returns (uint256) {
+//         uint256 balance = balanceOf(user);
+//         uint256 timeElapsed = block.timestamp - lastClaimed[user];
+//         uint256 yieldAmount = (balance * annualYieldRate * timeElapsed) / (365 days * 100);
+//         return yieldAmount;
+//     }
+
+//     function claimYield() external {
+//         uint256 yieldAmount = calculateYield(msg.sender);
+//         require(yieldAmount > 0, "No yield available");
+
+//         _mint(msg.sender, yieldAmount);
+//         lastClaimed[msg.sender] = block.timestamp;
+
+//         emit YieldClaimed(msg.sender, yieldAmount);
+//     }
+
+//     function setAnnualYieldRate(uint256 newRate) external onlyOwner {
+//         require(newRate >= 0 && newRate <= 100, "Invalid yield rate");
+//         annualYieldRate = newRate;
+//     }
 
 //     function liquidate(address user) external {
 //     uint256 collateralValue = deposits[user].amountUSDe * priceInIDR * LTV / 100;
@@ -99,7 +124,6 @@ contract StableCoinAntiInflasi is ERC20 {
 
 //     _burn(user, debt);
 
-// forge create src/StableCoinAntiInflasi.sol:StableCoinAntiInflasi --rpc-url https://holesky.gateway.tenderly.co --verify --etherscan-api-key 47SBFY8BZZC8KFIZBHX37JPJRW71WS45EN --private-key c53af8662980cd3cd17fbc9f8693f40721d452800560e84f389cd40ea720c43a --constructor-args "0x9D39A5DE30e57443BfF2A8307A4256c8797A3497" -- --broadcast
 //     emit Liquidate(user);
     
 // }
